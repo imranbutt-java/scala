@@ -1,4 +1,4 @@
-package com.practice.common.lectures.part1basics
+package com.scala.learn.lectures.part1basics
 
 /* Created by imransarwar on 2020-01-11 */
 object StringOps extends App {

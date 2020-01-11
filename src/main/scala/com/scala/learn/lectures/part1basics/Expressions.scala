@@ -1,4 +1,4 @@
-package com.practice.common.lectures.part1basics
+package com.scala.learn.lectures.part1basics
 
 object Expressions extends App {
   val num:Int = 2 + 3

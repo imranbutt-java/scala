@@ -1,4 +1,4 @@
-package com.practice.common.playground
+package com.scala.learn.playground
 
 object ScalaPlayground extends App {
   println("Hello World")

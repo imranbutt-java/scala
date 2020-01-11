@@ -1,4 +1,4 @@
-package com.practice.common.lectures.part1basics
+package com.scala.learn.lectures.part1basics
 
 object Functions extends App {
   //Function definition and equals expression that could be code block {} too

@@ -1,4 +1,4 @@
-package com.practice.common
+package com.scala.learn
 
 object HelloWorld {
   def main(args: Array[String]): Unit = {
