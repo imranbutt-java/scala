@@ -18,9 +18,10 @@ abstract class MyList[+A] {
 
   //Exercise
   //Type B, because transform would convert type A to B
-  def map[B](transformer: MyTransformer[A, B]): MyList[B]
-  def flatMap[B](transformer: MyTransformer[A, MyList[B]]): MyList[B]
-  def filter(predicate: MyPredicate[A]): MyList[A]
+  //MyPredicate is changed with Function Types
+  def map[B](transformer: A => B): MyList[B]
+  def flatMap[B](transformer: A => MyList[B]): MyList[B]
+  def filter(predicate: A => Boolean): MyList[A]
 
   //Because of flatMap we have to add concatenation function
   def ++[B >: A](list: MyList[B]): MyList[B]
@@ -34,9 +35,9 @@ case object Empty extends MyList[Nothing] {
   def add[B >: Nothing](element: B): MyList[B] = new Cons(element, Empty)
   def printElements: String = ""
 
-  def map[B](transformer: MyTransformer[Nothing, B]): MyList[B] = Empty
-  def flatMap[B](transformer: MyTransformer[Nothing, MyList[B]]): MyList[B] = Empty
-  def filter(predicate: MyPredicate[Nothing]): MyList[Nothing] = Empty
+  def map[B](transformer: Nothing => B): MyList[B] = Empty
+  def flatMap[B](transformer: Nothing => MyList[B]): MyList[B] = Empty
+  def filter(predicate: Nothing => Boolean): MyList[Nothing] = Empty
 
   def ++[B >: Nothing](list: MyList[B]): MyList[B] = list
 }
@@ -63,8 +64,9 @@ case class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
           => new Cons(2, new Cons(4, new Cons(6, Empty))))
 
    */
-  def map[B](transformer: MyTransformer[A, B]): MyList[B] =
-    new Cons(transformer.transorm(h), t.map(transformer))
+  // transformer.transorm(h) changed bcz of Function Types
+  def map[B](transformer: A => B): MyList[B] =
+    new Cons(transformer(h), t.map(transformer))
 
   /*
   [1,2,3].flatMap(n => [n, n+1])
@@ -73,8 +75,8 @@ case class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
         => [1,2] ++ [2,3] + Empty
           => [1,2,2,3]
    */
-  def flatMap[B](transformer: MyTransformer[A, MyList[B]]): MyList[B] =
-    transformer.transorm(h) ++ t.flatMap(transformer)
+  def flatMap[B](transformer: A => MyList[B]): MyList[B] =
+    transformer(h) ++ t.flatMap(transformer)
 
   //If head of the singly linked list passed with filter test method, we would recursively call tail and so on.
   /*
@@ -86,8 +88,8 @@ case class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
         => new Cons(2, Empty.filter(n % 2 == 0)) //because, tail of [3] is empty
           => new Cons(2, Empty)
    */
-  def filter(predicate: MyPredicate[A]): MyList[A] =
-    if(predicate.test(h)) new Cons(h, t.filter(predicate))
+  def filter(predicate: A => Boolean): MyList[A] =
+    if(predicate(h)) new Cons(h, t.filter(predicate))
     else t.filter(predicate)
 
   /*
@@ -101,13 +103,13 @@ case class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
 }
 
 //Exercise
-trait MyPredicate[-T] {
-  def test(element: T): Boolean
-}
-
-trait MyTransformer[-A, B] {
-  def transorm(elem: A): B
-}
+//trait MyPredicate[-T] {
+//  def test(element: T): Boolean
+//}
+//
+//trait MyTransformer[-A, B] {
+//  def transorm(elem: A): B
+//}
 
 object ListTest extends App {
   val listOfInt: MyList[Int] = new Cons[Int](1, new Cons[Int](2, new Cons[Int](3, Empty)))
@@ -118,17 +120,17 @@ object ListTest extends App {
   println(listOfInt.toString)
   println(listOfStr.toString)
 
-  println(listOfInt.map(new MyTransformer[Int, Int] {
-    override def transorm(elem: Int): Int = elem * 2
+  println(listOfInt.map(new Function1[Int, Int] {
+    override def apply(elem: Int): Int = elem * 2
   }))
 
-  println(listOfInt.filter(new MyPredicate[Int] {
-    override def test(element: Int): Boolean = element % 2 == 0
+  println(listOfInt.filter(new Function1[Int, Boolean] {
+    override def apply(element: Int): Boolean = element % 2 == 0
   }))
 
   println(listOfInt ++ bListOfInt)
-  println(listOfInt.flatMap(new MyTransformer[Int, MyList[Int]] {
-    override def transorm(elem: Int): MyList[Int] = new Cons(elem, new Cons[Int](elem + 1, Empty))
+  println(listOfInt.flatMap(new Function[Int, MyList[Int]] {
+    override def apply(elem: Int): MyList[Int] = new Cons(elem, new Cons[Int](elem + 1, Empty))
   }))
 
   println(clonedListOfInt == listOfInt)
