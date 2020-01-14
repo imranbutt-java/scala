@@ -1,5 +1,7 @@
 package com.scala.learn.exercies
 
+import com.scala.learn.lectures.part2oop.Generics.MyList
+
 import scala.annotation.tailrec
 
 /* Created by imransarwar on 2020-01-11 */
@@ -120,19 +122,34 @@ object ListTest extends App {
   println(listOfInt.toString)
   println(listOfStr.toString)
 
+  /*
+  CHANGED THIS
   println(listOfInt.map(new Function1[Int, Int] {
     override def apply(elem: Int): Int = elem * 2
   }))
+  TO
+  println(listOfInt.map(elem => elem * 2))
+  THEN
+  println(listOfInt.map(_ * 2))
 
-  println(listOfInt.filter(new Function1[Int, Boolean] {
-    override def apply(element: Int): Boolean = element % 2 == 0
-  }))
-
-  println(listOfInt ++ bListOfInt)
+  and
+  CHANGED THIS
   println(listOfInt.flatMap(new Function[Int, MyList[Int]] {
     override def apply(elem: Int): MyList[Int] = new Cons(elem, new Cons[Int](elem + 1, Empty))
   }))
+  TO
+  println(listOfInt.flatMap(elem => new Cons(elem, new Cons[Int](elem + 1, Empty))))
+  */
+  println(listOfInt.map(_ * 2))
+  println(listOfInt.filter(_ % 2 == 0))
+
+  println(listOfInt ++ bListOfInt)
+  //Here _ won't work as elem is used multiple times here, so each _ maps with exact one type
+  println(listOfInt.flatMap(elem => new Cons(elem, new Cons[Int](elem + 1, Empty))))
 
   println(clonedListOfInt == listOfInt)
+
+  val superAdder = (x: Int) => (y: Int) => x + y
+  println(superAdder(3)(4))
 
 }

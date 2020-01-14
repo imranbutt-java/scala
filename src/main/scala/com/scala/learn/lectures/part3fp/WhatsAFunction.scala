@@ -41,7 +41,8 @@ object WhatsAFunction extends App {
   }
 
   println(s"Concatenator: ${concatenator("12", "ab")}")
-
+  //val superAdder = (x: Int) => (y: Int) => x + y
+  //Above Lambda expression for below function
   val superAdder: Function1[Int, Function1[Int, Int]] = new Function1[Int, Function1[Int, Int]] {
     override def apply(x: Int): Int => Int = new Function1[Int, Int] {
       override def apply(y: Int): Int = x + y
