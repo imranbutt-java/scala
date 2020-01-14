@@ -54,4 +54,22 @@ object HOFsCurries extends App {
   println(standardFormatter(Math.PI))
   println(preciseFormatter(Math.PI))
 
+  //EXERCISE
+  /*
+  Expand MyList
+  - foreach method A => Unit
+    > it would print all values 1 \n 2 \3
+    [1,2,3].foreach(x => println(x))
+
+  - sortFunction((A,A) => Int) => MyList
+    [1,2,3].sort((x,y) => y-x) => [3,2,1]
+
+  - zipWith(list, (A,A) => B) => MyList[B]
+    [1,2,3].zipWith([4,5,6], x * y) => [1 * 4], [2 * 5], [3 * 6] => [4,10,18]
+
+  - fold(start)(function) => a value
+    [1,2,3].fold(1)(x+y) => 5
+
+   */
+
 }

@@ -27,6 +27,11 @@ abstract class MyList[+A] {
 
   //Because of flatMap we have to add concatenation function
   def ++[B >: A](list: MyList[B]): MyList[B]
+
+  //hofs
+  def foreach(f: A => Unit): Unit
+  def sort(compare:(A, A) => Int): MyList[A]
+  def zipWith[B,C](list: MyList[B], zip: (A,B) => C): MyList[C]
 }
 
 case object Empty extends MyList[Nothing] {
@@ -42,6 +47,12 @@ case object Empty extends MyList[Nothing] {
   def filter(predicate: Nothing => Boolean): MyList[Nothing] = Empty
 
   def ++[B >: Nothing](list: MyList[B]): MyList[B] = list
+
+  def foreach(f: Nothing => Unit): Unit = ()
+  def sort(compare: (Nothing, Nothing) => Int): MyList[Nothing] = Empty
+  def zipWith[B, C](list: MyList[B], zip: (Nothing, B) => C): MyList[C] =
+    if(list.isEmpty) throw new RuntimeException("Lists are not equal.")
+    else Empty
 }
 
 case class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
@@ -102,6 +113,27 @@ case class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
         =  new Cons(1, new Cons(2, new Cons(3, new Cons(4, new Cons(5, Empty))))
    */
   def ++[B >: A](list: MyList[B]): MyList[B] = new Cons[B](h, t ++ list)
+
+  def foreach(f: A => Unit): Unit = {
+    f(h)
+    t.foreach(f)
+  }
+
+  def sort(compare: (A, A) => Int): MyList[A] = {
+    //Auxilary Function, it is not tail rec implementation
+    def insert(x: A, sortedList: MyList[A]): MyList[A] =
+      if(sortedList.isEmpty) new Cons(x, Empty)
+      else if(compare(x, sortedList.head) <= 0) new Cons(x, sortedList)
+      else new Cons(sortedList.head, insert(x, sortedList.tail))
+
+    val sortedList = t.sort(compare)
+    insert(h, sortedList)
+  }
+
+  def zipWith[B, C](list: MyList[B], zip: (A, B) => C): MyList[C] = {
+    if(list.isEmpty) throw new RuntimeException("Lists are not equal.")
+    else new Cons(zip(h, list.head), t.zipWith(list.tail, zip))
+  }
 }
 
 //Exercise
@@ -151,5 +183,17 @@ object ListTest extends App {
 
   val superAdder = (x: Int) => (y: Int) => x + y
   println(superAdder(3)(4))
+
+  //HOF
+  println("< HOF functions >")
+  listOfInt.foreach(println)
+
+  println("Sorting...")
+  listOfInt.add(6).sort((x, y) => x - y).foreach(print)
+  println()
+  listOfInt.add(6).sort((x, y) => y - x).foreach(print)
+
+  println("\nZipWith...")
+  println(listOfInt.zipWith[String, String](listOfStr.add("Imran"), _ +"-"+ _ ))
 
 }
