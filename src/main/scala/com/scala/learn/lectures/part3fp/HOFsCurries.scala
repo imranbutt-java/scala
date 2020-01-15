@@ -56,6 +56,7 @@ object HOFsCurries extends App {
 
   //EXERCISE
   /*
+  1.
   Expand MyList
   - foreach method A => Unit
     > it would print all values 1 \n 2 \3
@@ -70,6 +71,48 @@ object HOFsCurries extends App {
   - fold(start)(function) => a value
     [1,2,3].fold(1)(x+y) => 5
 
+   2. toCurry(f: (Int, Int) => Int) => (Int => Int => Int)
+      fromCurry(f: (Int => Int => Int)) => (Int, Int) => Int
+
+   3. compose(f,g) => x => f(g(x))
+      andThen(f,g) = x => g(f(x))
+
+
    */
+
+  def toCurry(f: (Int, Int) => Int): Int => Int => Int =
+    x => y => f(x, y)
+
+  def fromCurry(f: Int => Int => Int): (Int, Int) => Int =
+    (x, y) => f(x)(y)
+
+  //def compose(f: Int => Int, g: Int => Int): Int => Int =
+  //  x => f(g(x))
+  //Making the above function generic, see below
+  def compose[A,B,C](f: A => B, g: C => A): C => B =
+    x => f(g(x))
+
+  def andThen[A,B,C](f: A => B, g: B => C): A => C =
+    x => g(f(x))
+
+  println("toCurry...")
+  def superAdder2: Int => Int => Int = toCurry(_ + _)
+  def add4 = superAdder2(4)
+  println(add4(7))
+
+  println("fromCurry...")
+  val simpleAdder = fromCurry(superAdder2)
+  println(simpleAdder(4,7))
+
+  println("Compose...")
+  val add2 = (x: Int) => x + 2
+  val times3 = (x: Int) => x * 3
+
+  // 2 + ( 2 * 3)
+  val composed = compose(add2, times3)
+  println(composed(2))
+  // 3 * (2 + 2)
+  val ordered = andThen(add2, times3)
+  println(ordered(2))
 
 }

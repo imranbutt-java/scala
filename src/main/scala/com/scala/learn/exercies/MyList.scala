@@ -32,6 +32,7 @@ abstract class MyList[+A] {
   def foreach(f: A => Unit): Unit
   def sort(compare:(A, A) => Int): MyList[A]
   def zipWith[B,C](list: MyList[B], zip: (A,B) => C): MyList[C]
+  def fold[B](start: B)(operator: (B, A) => B): B
 }
 
 case object Empty extends MyList[Nothing] {
@@ -51,8 +52,9 @@ case object Empty extends MyList[Nothing] {
   def foreach(f: Nothing => Unit): Unit = ()
   def sort(compare: (Nothing, Nothing) => Int): MyList[Nothing] = Empty
   def zipWith[B, C](list: MyList[B], zip: (Nothing, B) => C): MyList[C] =
-    if(list.isEmpty) throw new RuntimeException("Lists are not equal.")
+    if(!list.isEmpty) throw new RuntimeException("Lists are not equal.")
     else Empty
+  def fold[B](start: B)(operator: (B, Nothing) => B): B = start
 }
 
 case class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
@@ -134,6 +136,16 @@ case class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
     if(list.isEmpty) throw new RuntimeException("Lists are not equal.")
     else new Cons(zip(h, list.head), t.zipWith(list.tail, zip))
   }
+
+  /*
+  [1,2,3].fold(0)(+) =        // Here operator(1+0)
+    [2,3].fold(1)(+) =
+      [3].fold(3)(+) =
+        [].fold(6)(+) =       // Here Empty returns start
+          6
+   */
+  def fold[B](start: B)(operator: (B, A) => B): B =
+    t.fold(operator(start, h))(operator)
 }
 
 //Exercise
@@ -195,5 +207,8 @@ object ListTest extends App {
 
   println("\nZipWith...")
   println(listOfInt.zipWith[String, String](listOfStr.add("Imran"), _ +"-"+ _ ))
+
+  println("Fold Function...")
+  println(listOfInt.add(10).fold(0)(_ + _))
 
 }
