@@ -61,4 +61,16 @@ object MapFlatmapFiltterFor extends App {
   numbers.map { x =>
     x * 2
   }
+
+  //EXERCISE
+  /*
+  1. MyList supports for comprehension
+  To implement for comprehension for map, flatMap and filter we have below function definition
+  map(f: A => B) => MyList[B]
+  filter(f: A => Boolean) => MyList[A]
+  flatMap(f: A => MyList[B]) => MyList[B]
+  2. A small collection at most ONE element - Maybe[+T]
+  -  map, flatMap, filter
+   */
+
 }

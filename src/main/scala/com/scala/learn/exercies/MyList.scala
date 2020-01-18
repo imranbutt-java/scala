@@ -211,4 +211,10 @@ object ListTest extends App {
   println("Fold Function...")
   println(listOfInt.add(10).fold(0)(_ + _))
 
+  //for comprehension implementation
+  val forImpl = for {
+    x <- listOfInt
+    y <- listOfStr
+  } yield  x +"-"+y
+  println(forImpl)
 }
