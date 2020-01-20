@@ -10,6 +10,19 @@ object PatternsEverywhere extends App {
     case e: NullPointerException => println("npe")
     case _ => println("Exception")
   }
+  
+  /*
+  The above actually works sth like this
+  try {
+    throw new NullPointerException
+  } catch(e) { 
+    e match {
+      case e: RuntimeException => println("rte")
+      case e: NullPointerException => println("npe")
+      case _ => println("Exception")
+    }
+  }
+  */
 
   // Idea # 2
   // Generators are also pattern matching
