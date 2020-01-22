@@ -27,6 +27,7 @@ object DarkSugar extends App {
   List(1,2,3).map { x =>
     x + 1
   }.foreach(print)
+  println
 
   // 2. Instance of traits can be expressed as lambda expression
   // Single abstract method
@@ -60,7 +61,7 @@ object DarkSugar extends App {
   //Now we may create instance of abstract class by just providing the implementation
   val anImplementedType: AnAbstractType = (x: Int) => println("An implemented function")
 
-  // 3. Special methods prepend like :: and #: methods are special
+  // 3. Special methods prepend like :: and #:: methods are special
   val prependedList = 2 :: List(1)
   //Now  as we think it would be from left to right 2 function List(1) but 2 don't have :: function
   // Actually scala says ::, last character decides associativity of Method
@@ -70,4 +71,19 @@ object DarkSugar extends App {
   1 :: 2 :: 3 :: 4 :: List(5)
   //Actually it is
   List(5).::(4).::(3).::(2).::(1)
+
+  class MyStream[T] {
+    def -->:(value: T): MyStream[T] = this // Actual implementation here
+  }
+
+  // So here these operators just end with colon : that is why they are right associative
+  val myStream = 1 -->: 2 -->: 3 -->: new MyStream[Int]
+
+  // 4. Multi-word method naming
+  class TeenGirl(name: String) {
+    def `said to me`(gossip: String): Unit = println(s"$name said, $gossip")
+  }
+
+  val nina = new TeenGirl("Nina")
+  nina `said to me` "How are you!"
 }
