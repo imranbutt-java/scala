@@ -86,4 +86,55 @@ object DarkSugar extends App {
 
   val nina = new TeenGirl("Nina")
   nina `said to me` "How are you!"
+
+  // 5. Infix Types
+  class Composite[A, B] {
+    def apply(x: A, y: B): Composite[A, B] = {
+      println(s"$x and $y")
+      new Composite()
+    }
+  }
+  val composite1: Composite[Int, String] = new Composite()
+  val composite2: Int Composite String = new Composite()
+
+  composite1(2, "Hello")
+  composite2(3, "Bye")
+
+  class -->[A, B] {
+    def apply(x: A, y: B): A --> B = {
+      println(s"$x --> $y")
+      new -->()
+    }
+  }
+  val composite3: Int --> String = new -->[Int, String]()
+  val composite4: Int --> Int = new -->[Int, Int]()
+
+  composite3(5, "Good")
+  composite4(6, 7)
+
+  // 6. update() is a special function much like apply()
+  val anArray = Array(1,2,3)
+  // In array it is an update method like this
+  //anArray.update(2, 8) == update(index: Int, element: Type
+  // Used in Mutable collection
+  anArray(2) = 8
+  anArray.foreach(print)
+  println
+
+  // 7. Setters for Mutable Containers
+  class Mutable {
+    private var internalMember: Int = 0
+    def member: Int = {
+      println(s"Getter is called, internalMember = $internalMember")
+      internalMember
+    }
+    def member_=(value: Int): Unit = {
+      println(s"Setter is called, internalMember = $internalMember")
+      internalMember = value
+    }
+  }
+
+  val aMutableContainer = new Mutable()
+  aMutableContainer.member = 10
+  aMutableContainer.member
 }
