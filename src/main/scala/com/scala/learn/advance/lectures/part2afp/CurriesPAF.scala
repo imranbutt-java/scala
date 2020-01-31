@@ -6,6 +6,11 @@ package com.scala.learn.advance.lectures.part2afp
 object CurriesPAF extends App {
 
   // curried functions
+  // Here it means, function takes Int and returns a function Int => Int that also takes an Int but returns Int
+  // We pass to superAdder x = 3
+  // returned y => x + y implies y = 3 + y
+  // Now if we call function y => 3 + y, and give y = 5
+  // We would get x + y = 3 + 5 = 8
   val superAdder: Int => Int => Int =
     x => y => x + y
 

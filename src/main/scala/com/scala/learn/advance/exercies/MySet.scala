@@ -73,6 +73,8 @@ class PropertyBasedSet[A](property: A => Boolean) extends MySet[A] {
     new PropertyBasedSet[A](x => property(x) || anotherSet(x))
 
   // all integers => (_ % 3) => [0 1 2]
+  // Means we can't give any definite answer, what are exact numbers which you may think, because,
+  // for _ % 3 means the remainder [0 1 2] for numbers that may be any set of numbers
   def map[B](f: A => B): MySet[B] = politelyFail
   def flatMap[B](f: A => MySet[B]): MySet[B] = politelyFail
   def foreach(f: A => Unit): Unit = politelyFail
@@ -127,11 +129,21 @@ class NonEmptySet[A](head: A, tail: MySet[A]) extends MySet[A] {
   }
 
   // part 2
+  // If elem is head, we would remove it straight forward, otherwise we would remove from tail and append head
   def -(elem: A): MySet[A] =
     if (head == elem) tail
     else tail - elem + head
 
   def --(anotherSet: MySet[A]): MySet[A] = filter(!anotherSet)
+  /*
+  For intersection, we say both set have the same element, so filter says other set contains x too
+  def &(anotherSet: MySet[A]): MySet[A] = filter(x => anotherSet.contains(x))
+  \/
+  means contains also available in set, so we may directly call using variable
+  def &(anotherSet: MySet[A]): MySet[A] = filter(x => anotherSet(x))
+  \/
+  Further reducing would result as below
+   */
   def &(anotherSet: MySet[A]): MySet[A] = filter(anotherSet) // intersection = filtering!
 
   // new operator
