@@ -8,7 +8,7 @@ object HOFsCurries extends App {
   // Higher Order Function (HOF) : That either takes a function or returns a function
   // Like we wrote before, map, flatMap, filter
 
-  //Now let say we want to apply n times a function on x
+  //Now let say we want to apply n times a function f on x
   //nTimes(f, n, x)
   //nTimes(f, 3, x) = f(f(f(x))) = nTimes(f, 2, f(x)) = f(f(f(x)))
   //nTimes(f, n, x) = f(f, n-1, f(x)) = f(f, n-1, f(f, n-2, f(x)))

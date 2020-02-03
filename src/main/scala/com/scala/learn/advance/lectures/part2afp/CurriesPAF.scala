@@ -16,25 +16,40 @@ object CurriesPAF extends App {
 
   val add3 = superAdder(3) // Int => Int = y => 3 + y
   println(add3(5))
-  println(superAdder(3)(5)) // curried function
+  println(superAdder(3)(5)) // curried function, multiple parameter list
 
-  // METHOD!
+  // METHOD! methods are instances of classes but not instances of function themselves
   def curriedAdder(x: Int)(y: Int): Int = x + y // curried method
 
+  // If we remove Int => Int, compiler would complain
+  // add4 = y => 4 + y
+  // Here method curriedAdder is converted into function value
+  // curriedAdder expect 2 param list, but we provided one
   val add4: Int => Int = curriedAdder(4)
-  // lifting = ETA-EXPANSION
+  // lifting = ETA-EXPANSION : Functions out of methods
 
   // functions != methods (JVM limitation)
   def inc(x: Int) = x + 1
-  List(1,2,3).map(x => inc(x))  // ETA-expansion
+  // List(1,2,3).map(inc)
+  // So Compiler internally uses ETA-expansion and implement method as function and apply on each element as shown below
+  List(1,2,3).map(x => inc(x))
 
   // Partial function applications
+  // Here using _ means telling compiler do an ETA-Expansion and turn curriedAdder method into a function value after
+  // applying value 5
   val add5 = curriedAdder(5) _ // Int => Int
 
   // EXERCISE
   val simpleAddFunction = (x: Int, y: Int) => x + y
   def simpleAddMethod(x: Int, y: Int) = x + y
   def curriedAddMethod(x: Int)(y: Int) = x + y
+
+  /*
+  I tried
+  val addT = simpleAddFunction(7, _)
+  val add2T = simpleAddMethod(7, _)
+  val add3T = curriedAddMethod(7) _
+  */
 
   // add7: Int => Int = y => 7 + y
   // as many different implementations of add7 using the above
@@ -44,7 +59,7 @@ object CurriesPAF extends App {
   val add7_6 = simpleAddFunction(7, _: Int) // works as well
 
   val add7_3 = curriedAddMethod(7) _  // PAF
-  val add7_4 = curriedAddMethod(7)(_) // PAF = alternative syntax
+  val add7_4 = curriedAddMethod(7)(_) // PAF = alternative syntax, this works with non-curried methods
 
   val add7_5 = simpleAddMethod(7, _: Int) // alternative syntax for turning methods into function values
                 // y => simpleAddMethod(7, y)
@@ -65,6 +80,7 @@ object CurriesPAF extends App {
   def curriedFormatter(s: String)(number: Double): String = s.format(number)
   val numbers = List(Math.PI, Math.E, 1, 9.8, 1.3e-12)
 
+  //Lift this method to function val using _
   val simpleFormat = curriedFormatter("%4.2f") _ // lift
   val seriousFormat = curriedFormatter("%8.6f") _
   val preciseFormat = curriedFormatter("%14.12f") _
@@ -96,11 +112,13 @@ object CurriesPAF extends App {
   byName(parenMethod) // ok but beware ==> byName(parenMethod())
   //  byName(() => 42) // not ok
   byName((() => 42)()) // ok
+  // function value is not a substitute of byName parameter
   //  byName(parenMethod _) // not ok
 
   //  byFunction(45) // not ok
+  // Here method(is parameterless method) is evaluated to the value 42 and that 42 is not valid parameter for byFunction
   //  byFunction(method) // not ok!!!!!! does not do ETA-expansion!
-  byFunction(parenMethod) // compiler does ETA-expansion
+  byFunction(parenMethod) // compiler does ETA-expansion, because it is a method that has parenthesis
   byFunction(() => 46) // works
   byFunction(parenMethod _) // also works, but warning- unnecessary
 }
