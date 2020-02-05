@@ -46,6 +46,7 @@ object CurriesPAF extends App {
   val add7_3 = curriedAddMethod(7) _  // PAF
   val add7_4 = curriedAddMethod(7)(_) // PAF = alternative syntax
 
+  // Using _: Int is for function arity, to convert function into function value by reducing number of params
   val add7_5 = simpleAddMethod(7, _: Int) // alternative syntax for turning methods into function values
                 // y => simpleAddMethod(7, y)
 
@@ -99,7 +100,9 @@ object CurriesPAF extends App {
   //  byName(parenMethod _) // not ok
 
   //  byFunction(45) // not ok
-  //  byFunction(method) // not ok!!!!!! does not do ETA-expansion!
+  //  byFunction(method) // not ok!!!!!! does not do ETA-expansion! and can't be passed to HOFs
+  // But here method _ is converted to Function value and then it was used as a param in byFunction
+  println(byFunction(method _))
   byFunction(parenMethod) // compiler does ETA-expansion
   byFunction(() => 46) // works
   byFunction(parenMethod _) // also works, but warning- unnecessary
