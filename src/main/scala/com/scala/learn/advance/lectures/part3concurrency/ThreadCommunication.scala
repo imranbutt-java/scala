@@ -160,6 +160,11 @@ object ThreadCommunication extends App {
             producer produces value, two Cons are waiting
             notifies ONE consumer, notifies on buffer
             notifies the other consumer
+            that would cause problem, so 2nd consumer would proceed and at line
+            val x = buffer.dequeue()
+            say queue is empty, it would throw exception.
+            That is why here while loop is used insted of if condition
+            while (buffer.isEmpty) {
 
            */
           while (buffer.isEmpty) {
@@ -238,29 +243,31 @@ object ThreadCommunication extends App {
       Thread.sleep(2000)
       println("[announcer] Rock'n roll!")
       bell.synchronized {
-        bell.notify()
+        bell.notifyAll()
       }
     }).start()
   }
 
   // testNotifyAll()
 
+  // When one friend bow for other and the other bow too, but both wait for eachother to ger straight
   // 2 - deadlock
   case class Friend(name: String) {
     def bow(other: Friend) = {
       this.synchronized {
-        println(s"$this: I am bowing to my friend $other")
+        println(s"${this.name}: I am bowing to my friend ${other.name}")
         other.rise(this)
-        println(s"$this: my friend $other has risen")
+        println(s"${this.name}: my friend ${other.name} has risen")
       }
     }
 
     def rise(other: Friend) = {
       this.synchronized {
-        println(s"$this: I am rising to my friend $other")
+        println(s"${this.name}: I am rising to my friend ${other.name}")
       }
     }
 
+    // In trafic 2 people come in front of each other and one give the path and other also give the path.
     var side = "right"
     def switchSide(): Unit = {
       if (side == "right") side = "left"
@@ -269,7 +276,7 @@ object ThreadCommunication extends App {
 
     def pass(other: Friend): Unit = {
       while (this.side == other.side) {
-        println(s"$this: Oh, but please, $other, feel free to pass...")
+        println(s"${this.name}: Oh, but please, ${other.name}, feel free to pass...")
         switchSide()
         Thread.sleep(1000)
       }
@@ -279,8 +286,8 @@ object ThreadCommunication extends App {
   val sam = Friend("Sam")
   val pierre = Friend("Pierre")
 
-  //  new Thread(() => sam.bow(pierre)).start() // sam's lock,    |  then pierre's lock
-  //  new Thread(() => pierre.bow(sam)).start() // pierre's lock  |  then sam's lock
+//  new Thread(() => sam.bow(pierre)).start() // sam's lock,    |  then pierre's lock
+//  new Thread(() => pierre.bow(sam)).start() // pierre's lock  |  then sam's lock
 
   // 3 - livelock
   new Thread(() => sam.pass(pierre)).start()
