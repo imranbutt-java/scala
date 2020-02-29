@@ -106,6 +106,10 @@ object TypeClasses extends App {
   */
 
   // part 3
+  // How this class would benefit, so we may provide different Serializer for class type T
+  // john.toHTML(UserSerializer) here explicitly calling serializer
+  // john.toHTML(SomeNewSerializer)
+  // john.toHTML
   implicit class HTMLEnrichment[T](value: T) {
     def toHTML(implicit serializer: HTMLSerializer[T]): String = serializer.serialize(value)
   }
@@ -118,10 +122,11 @@ object TypeClasses extends App {
     - super expressive!
    */
 
-  println(2.toHTML)
-  println(john.toHTML(PartialUserSerializer))
+  println(2.toHTML) // println(new HTMLEnrichment[Int](2).toHTML(IntSerializer)
+  println(john.toHTML(PartialUserSerializer)) // explicitly calling other Serializer
 
   /*
+  Type class here gives many things
     - type class itself --- HTMLSerializer[T] { .. }
     - type class instances (some of which are implicit) --- UserSerializer, IntSerializer
     - conversion with implicit classes --- HTMLEnrichment
@@ -131,16 +136,27 @@ object TypeClasses extends App {
   def htmlBoilerplate[T](content: T)(implicit serializer: HTMLSerializer[T]): String =
     s"<html><body> ${content.toHTML(serializer)}</body></html>"
 
+  // Here HTMLSerializer is a context bound, that tells the compiler to inject
+  // (implicit serializer: HTMLSerializer[T])
+  // after
+  // (content: T)
+  // that makes the above method to write like below with syntactical sugar
+  // But disadvantage, we can't inject serializer by name
   def htmlSugar[T : HTMLSerializer](content: T): String = {
+    // Initially we use like this
+    // s"<html><body> ${content.toHTML}</body></html>"
+    // Applying implicitly would give an edge of using explicit Serializer
     val serializer = implicitly[HTMLSerializer[T]]
     // use serializer
     s"<html><body> ${content.toHTML(serializer)}</body></html>"
   }
 
   // implicitly
+  // Let suppose, we have data privacy and we have to show the data on the screen, we have some permission stuff
+  // Say someone made permissions in some where code
   case class Permissions(mask: String)
   implicit val defaultPermissions: Permissions = Permissions("0744")
 
-  // in some other part of the  code
+  // in some other part of the  code, we want to surface out what is the implicit values for permissions
   val standardPerms = implicitly[Permissions]
 }

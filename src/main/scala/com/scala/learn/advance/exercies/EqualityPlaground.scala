@@ -32,17 +32,14 @@ object EqualityPlayground extends App {
   val john = User("John", 32, "john@rockthejvm.com")
   val anotherJohn = User("John", 45, "anotherJohn@rtjvm.com")
   // AD-HOC polymorphism, which is different from Polymorphism, so here in Equal we may call 2
-  // different class for equality comparison, that is why it is called polymorphic
-
-  case class OtherUser(name: String, age: Int)
-  val otherUser = OtherUser("Imran", 32)
-  println(Equal(john, otherUser))
+  // different classes for equality comparison, that is why it is called polymorphic
 
   /*
     Exercise - improve the Equal TC with an implicit conversion class
     ===(anotherValue: T)
     !==(anotherValue: T)
    */
+
   implicit class TypeSafeEqual[T](value: T) {
     def ===(other: T)(implicit equalizer: Equal[T]): Boolean = equalizer.apply(value, other)
     def !==(other: T)(implicit equalizer: Equal[T]): Boolean = ! equalizer.apply(value, other)
@@ -50,6 +47,7 @@ object EqualityPlayground extends App {
 
   println(john === anotherJohn)
   /*
+  How compiler came to conclusion using implicit
     john.===(anotherJohn)
     new TypeSafeEqual[User](john).===(anotherJohn)
     new TypeSafeEqual[User](john).===(anotherJohn)(NameEquality)
