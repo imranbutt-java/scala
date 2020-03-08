@@ -12,7 +12,7 @@ object Variance extends App {
   // "inheritance" - type substitution of generics
 
   class Cage[T]
-  // Qustion: Should a cage cat also kooran cord inherit from cage
+  // Question: Should a cage cat also kooran cord inherit from cage
   // One possible answer:
   // yes - covariance
   class CCage[+T]
