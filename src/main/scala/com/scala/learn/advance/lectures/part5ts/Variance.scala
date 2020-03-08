@@ -118,6 +118,7 @@ object Variance extends App {
    */
 
   /**
+   * Parking Application that checks for illegal parking
    * 1. Invariant, covariant, contravariant
    *   Parking[T](things: List[T]) {
    *     park(vehicle: T)
@@ -134,6 +135,8 @@ object Variance extends App {
   class Car extends Vehicle
   class IList[T]
 
+  // Invariant Implementation
+  // This implementation is limited and it allows only one type
   class IParking[T](vehicles: List[T]) {
     def park(vehicle: T): IParking[T] = ???
     def impound(vehicles: List[T]): IParking[T] = ???
@@ -142,7 +145,10 @@ object Variance extends App {
     def flatMap[S](f: T => IParking[S]): IParking[S] = ???
   }
 
+  // Covariant Implementation
+  // Considered better in case we expect collection of Vehicles(Things)
   class CParking[+T](vehicles: List[T]) {
+    // def park(vehicle: T): CParking[T] = ???
     def park[S >: T](vehicle: S): CParking[S] = ???
     def impound[S >: T](vehicles: List[S]): CParking[S] = ???
     def checkVehicles(conditions: String): List[T] = ???
@@ -150,6 +156,8 @@ object Variance extends App {
     def flatMap[S](f: T => CParking[S]): CParking[S] = ???
   }
 
+  // Contravariant Implementation
+  // Better to use when we consider group of actions
   class XParking[-T](vehicles: List[T]) {
     def park(vehicle: T): XParking[T] = ???
     def impound(vehicles: List[T]): XParking[T] = ???
@@ -164,9 +172,19 @@ object Variance extends App {
     - use contravariance = GROUP OF ACTIONS
    */
 
+  // Answer for Q.2
+  // IParking would remain same
+
   class CParking2[+T](vehicles: IList[T]) {
     def park[S >: T](vehicle: S): CParking2[S] = ???
+    // Covariant type T occurs in invariant position
+    // Why the below function is not compiled, where IList was contravariant and is placed in function parameter
+    // def impound(vehicles: IList[T]): CParking2[T] = ???
+    // Reason: +T is covariant and still IList[T] is contravariant, compiler would complain
     def impound[S >: T](vehicles: IList[S]): CParking2[S] = ???
+    // Covariant type T occurs in invariant position
+    // It is because of IList[T]
+    // def checkVehicles(conditions: String): IList[T] = ???
     def checkVehicles[S >: T](conditions: String): IList[S] = ???
   }
 
