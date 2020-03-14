@@ -17,7 +17,7 @@ object TypeMembers extends App {
   }
   val ac = new AnimalCollection
   // ac.AnimalType would compile but there is nothing to initialize as there is no constructor for AnimalType
-  // val dog: ac.AnimalType = ???
+  val dog: ac.AnimalType = ???
   // The same would go with BoundedAnimal, compiler never let assign Cat for BoundedAnimal
   //  val cat: ac.BoundedAnimal = new Cat
 
