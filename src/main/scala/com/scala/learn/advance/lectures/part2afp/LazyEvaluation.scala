@@ -10,7 +10,9 @@ object LazyEvaluation extends App {
     println("hello")
     42
   }
+  //Here it would evaluate x, so print hello and assign 42 to x and then x is printed
   println(x)
+  // It would only print 42, because x is already evaluated
   println(x)
 
   // examples of implications:
@@ -22,9 +24,17 @@ object LazyEvaluation extends App {
   def simpleCondition: Boolean = false
 
   lazy val lazyCondition = sideEffectCondition
+  // lazyCondition won't be evaluated unless it is necessary
   println(if (simpleCondition && lazyCondition) "yes" else "no")
 
   // in conjunction with call by name
+
+  // Wrong
+  def byNameMethodWrong(n: => Int) = n + n + n + 1
+  // see thread was being called three times and let us wait for 3 sec as well printing side effect message "waiting"
+  println(s"Wrong => ${byNameMethodWrong(retrieveMagicValue)}")
+
+  // Correct
   def byNameMethod(n: => Int): Int = {
     // CALL BY NEED
     lazy val t = n // only evaluated once
@@ -56,9 +66,12 @@ object LazyEvaluation extends App {
   val gt20 = lt30.filter(greaterThan20)
   println(gt20)
 
+  // withFilter runs predicate on need basis and in lazy way also the order of predicate is managed.
+  // If we only print gt20Lazy it wouldn't show side effects printing
   val lt30lazy = numbers.withFilter(lessThan30) // lazy vals under the hood
   val gt20lazy = lt30lazy.withFilter(greaterThan20)
   println
+  gt20lazy
   gt20lazy.foreach(println)
 
   // for-comprehensions use withFilter with guards
@@ -69,6 +82,7 @@ object LazyEvaluation extends App {
 
   /*
     Exercise: implement a lazily evaluated, singly linked STREAM of elements.
+    STREAM: head is already available but tail is lazily evaluated on deamnd
 
     naturals = MyStream.from(1)(x => x + 1) = stream of natural numbers (potentially infinite!)
     naturals.take(100).foreach(println) // lazily evaluated stream of the first 100 naturals (finite stream)

@@ -6,11 +6,13 @@ package com.scala.learn.advance.lectures.part2afp
 object Monads extends App {
 
   // our own Try monad
-
+  // Monad may throw exception, but here we are going to manage exception by Try implementation
   trait Attempt[+A] {
+    // Required: Flatmap implementation
     def flatMap[B](f: A => Attempt[B]): Attempt[B]
   }
   object Attempt {
+    // Required: Unit function implementation
     def apply[A](a: => A): Attempt[A] =
       try {
         Success(a)
@@ -85,8 +87,10 @@ object Monads extends App {
    */
 
   // 1 - Lazy monad
+  // Normally in lazy monads, value is evaluated once and further it was used.
   class Lazy[+A](value: => A) {
     // call by need
+    // So that only evaluate the value once and next time just use that value
     private lazy val internalValue = value
     def use: A = internalValue
     def flatMap[B](f: (=> A) => Lazy[B]): Lazy[B] = f(internalValue)
