@@ -27,4 +27,30 @@ object CallBVvsCallBN extends App {
   //printFirst(infinite(20), 21)
   //Here infinite(20) was not called in printFirst() function so no stack overflow
   printFirst(21, infinite(20))
+
+  def codeCallByValue[T](code: T) = {
+    val start = System.nanoTime()
+    val result = code
+    val end = System.nanoTime()
+    println(result, s"Time spent: ${(end-start)/100000}")
+  }
+
+  def codeCallByName[T](code: => T) = {
+    val start = System.nanoTime()
+    val result = code
+    val end = System.nanoTime()
+    (result, s"Time spent: ${(end - start) /100000}")
+  }
+
+  val byValCodeExecute = codeCallByValue {
+    Thread.sleep(2000)
+    10
+  }
+  val byNameCodeExecute = codeCallByName {
+    Thread.sleep(2000)
+    20
+  }
+
+  println(s"By Val: $byValCodeExecute")
+  println(s"By Name: $byNameCodeExecute")
 }
