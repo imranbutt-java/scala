@@ -30,12 +30,12 @@ object Inheritance extends App {
   class Person(name: String, age: Int)
   //This statement won't work
   //class Adult(name: String, age: Int, id: String) extends Person
-  //thus, need to provide name and age to parent
+  //thus, need to provide name and age to parent, bcz JVM expect what constructor you are calling for Person
   class Adult(name: String, age: Int, id: String) extends Person(name, age)
 
   //Override
   class Dog(override val creature: String) extends Animal {
-    //class variables could be overriden in class variables
+    //class variables could be overriden in class variables, like above creature is overriden
     override def eat = {
       println("Super is called...")
       super.eat
