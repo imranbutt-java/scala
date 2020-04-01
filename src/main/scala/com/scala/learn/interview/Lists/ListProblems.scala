@@ -16,6 +16,9 @@ sealed abstract class RList[+T] {
 
   // Q: Find k-th element at index
   def apply(index: Int): T
+
+  // Q: Find List Length
+  def length: Int
 }
 
 case object RNil extends RList[Nothing] {
@@ -31,6 +34,8 @@ case object RNil extends RList[Nothing] {
 //  override def prepend[S >: Nothing](elem: S): RList[S] = Cons(elem, this)
 
   override def apply(index: Int): Nothing = throw new IndexOutOfBoundsException
+
+  override def length: Int = 0
 }
 
 // Cons renamed to :: as acceptable name class in scala
@@ -58,6 +63,15 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
     }
     applyTailRec(this, 0)
   }
+
+  override def length: Int = {
+    @tailrec
+    def lengthTailRec(remaining: RList[T], count: Int): Int = {
+      if(remaining.isEmpty) count + 1
+      else lengthTailRec(remaining.tail, count+1)
+    }
+    lengthTailRec(this, 0)
+  }
 }
 
 object ListProblems extends App {
@@ -67,6 +81,9 @@ object ListProblems extends App {
 //  val aList = Cons(1, Cons(2, Cons(3, RNil)))
 //  val aList = ::(1, ::(2, ::(3, RNil)))
   val aList = 1 :: 2 :: 3 :: RNil // RNil.::(3).::(2).::(1)
+  println("Find K-th Element #")
   println(aList)
   println(aList(2))
+  println("Find Length of List #")
+  println(aList.length)
 }
