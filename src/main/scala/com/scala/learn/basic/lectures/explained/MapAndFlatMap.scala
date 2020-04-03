@@ -1,4 +1,4 @@
-package com.scala.learn.basic.lectures.hof
+package com.scala.learn.basic.lectures.explained
 
 /* imransarwar created on 19/03/2020*/
 object MapAndFlatMap extends App {
