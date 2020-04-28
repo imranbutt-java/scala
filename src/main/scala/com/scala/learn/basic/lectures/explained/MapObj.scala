@@ -1,7 +1,7 @@
 package com.scala.learn.basic.lectures.explained
 
 /* imransarwar created on 11/04/2020*/
-object Map extends App {
+object MapObj extends App {
   // function is applied on each element and we get another list
   // (function(n) = n + 1 ) is applied on each element
   val oneToThreeList = List(1 to 3)

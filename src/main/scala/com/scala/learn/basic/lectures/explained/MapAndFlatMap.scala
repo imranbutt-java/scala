@@ -23,7 +23,7 @@ object MapAndFlatMap extends App {
   case class Person(age: Int)
   val nums = List(1,2,3)
   def f(x: Int) = List(x + 1, x + 2)
-  def g(x: Int): Map[Int, Int] = Map[Int, Int](1 -> (x + 1), 2 -> (x + 2))
+  def g(x: Int): Map[Int, Int] = Map(1 -> (x + 1), 2 -> (x + 2))
   def h(x: Int): Person = Person(x)
   val flatMapAns = nums.flatMap(x => f(x))
   val mapAns = nums.map(x => f(x))

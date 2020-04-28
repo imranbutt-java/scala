@@ -14,6 +14,10 @@ sealed abstract class RList[+T] {
   // By making prepend as :: we made it right associative
   def ::[S >: T](elem: S): RList[S] = new ::(elem, this)
 
+  /**
+   * Easy Problems
+   */
+
   // Q: Find k-th element at index
   def apply(index: Int): T
 
@@ -33,6 +37,14 @@ sealed abstract class RList[+T] {
   def map[S](f: T => S): RList[S]
   def flatMap[S](f: T => RList[S]): RList[S]
   def filter(f: T => Boolean): RList[T]
+
+  /**
+   * Medium Problems
+   */
+  // Run Length Encoding
+  def rle: RList[(T, Int)]
+  // Duplicate Each element, number of times in a Row
+  def duplicateEach(times: Int): RList[T]
 }
 
 case object RNil extends RList[Nothing] {
@@ -60,6 +72,14 @@ case object RNil extends RList[Nothing] {
   override def map[S](f: Nothing => S): RList[S] = RNil
   override def flatMap[S](f: Nothing => RList[S]): RList[S] = RNil
   override def filter(f: Nothing => Boolean): RList[Nothing] = RNil
+
+  /**
+   * Medium
+   */
+  override def rle: RList[(Nothing, Int)] = RNil
+
+  override def duplicateEach(times: Int): RList[Nothing] = RNil
+
 }
 
 // Cons renamed to :: as acceptable name class in scala
@@ -221,6 +241,41 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
     }
     filterTailRec(this, RNil)
   }
+
+  /**
+   * Medium
+   */
+  /*
+  [1,2,2,1].rle = rleTailRec([2,2,1], [], (1,1)) // Goes to last line
+  = rleTailRec([2,1], [(1,1)], (2,1)) // this call would go to 3rd if condition
+  = rleTailRec([1], [(1,1)], (2,2)) // this call would go to the last condition
+  = rleTailRec([], [(1,1), (2,1)], (1,1)) // this call would go to the 2nd condition
+  = [(1,1), (2,1), (1,1)]  this would be sent back
+   */
+  override def rle: RList[(T, Int)] = {
+    def rleTailRec(remaining: RList[T], acc: RList[(T, Int)], current: (T, Int)): RList[(T, Int)] = {
+      if(remaining.isEmpty && current._2 == 0) acc
+      else if(remaining.isEmpty) current :: acc
+      else if(remaining.head == current._1) rleTailRec(remaining.tail, acc, current.copy(_2 = current._2 + 1))
+      else rleTailRec(remaining.tail, current :: acc, (remaining.head, 1))
+    }
+    rleTailRec(tail, RNil, (head, 1)).reverse
+  }
+
+  /*
+   Complexity O(N * times)
+   */
+  override def duplicateEach(times: Int): RList[T] = {
+    def addXTimes(item: T, result: RList[T], times: Int): RList[T] = {
+      if(times == 0) result
+      else addXTimes(item, item :: result, times - 1)
+    }
+    def duplicateTailRec(remaining: RList[T], acc: RList[T]): RList[T] = {
+      if(remaining.isEmpty) acc
+      else duplicateTailRec(remaining.tail, acc ++ addXTimes(remaining.head, RNil, times))
+    }
+    duplicateTailRec(this, RNil)
+  }
 }
 
 // Creating companion object, to create RList
@@ -271,4 +326,11 @@ object ListProblems extends App {
 
   println("# filter Function")
   println(RList.from(1 to 5).filter(x => x % 2 == 0))
+
+  println("# RLE")
+  println((1 :: 2 :: 2 :: 1 :: RNil).rle)
+  println((1 :: 1 :: 2 :: 2 :: RNil).rle)
+
+  println("# Duplicate Each Element N Times")
+  println((1 :: 2 :: 3 :: RNil).duplicateEach(3))
 }
