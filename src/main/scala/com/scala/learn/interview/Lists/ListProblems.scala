@@ -1,6 +1,7 @@
 package com.scala.learn.interview.Lists
 
 import scala.annotation.tailrec
+import scala.util.Random
 
 // Could be made trait too !!!
 //trait RList[+T] {
@@ -45,6 +46,10 @@ sealed abstract class RList[+T] {
   def rle: RList[(T, Int)]
   // Duplicate Each element, number of times in a Row
   def duplicateEach(times: Int): RList[T]
+  // Rotate List
+  def rotate(k: Int): RList[T]
+  // Random samples
+  def samples(k: Int): RList[T]
 }
 
 case object RNil extends RList[Nothing] {
@@ -80,6 +85,9 @@ case object RNil extends RList[Nothing] {
 
   override def duplicateEach(times: Int): RList[Nothing] = RNil
 
+  override def rotate(k: Int): RList[Nothing] = RNil
+
+  override def samples(k: Int): RList[Nothing] = RNil
 }
 
 // Cons renamed to :: as acceptable name class in scala
@@ -228,7 +236,44 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
       if(remaining.isEmpty) acc.reverse
       else flatMapTailRec(remaining.tail, f(remaining.head).reverse ++ acc)
     }
-    flatMapTailRec(this, RNil)
+
+    /*
+    [1,2,3].betterFlatMap(x => [x, x*2]) = betterFlatMap([1,2,3], [])
+    = betterFlatMap([2,3], [[2,1]]) //[1,2].reverse
+    = betterFlatMap([3], [[4,2], [2,1]])
+    = betterFlatMap([], [[6,4], [4,2], [2,1]])
+    = concatAll([[6,4], [4,2], [2,1]], [], [])
+    = concatAll([[4,2], [2,1]], [6,4], [])
+    = concatAll([[4,2], [2,1]], [4], [6])
+    = concatAll([[4,2], [2,1]], [], [4,6])
+    = concatAll([[2,1]], [4,2], [4,6])
+    = concatAll([[2,1]], [2], [4,4,6])
+    = concatAll([[2,1]], [], [2, 4, 4, 6])
+    = concatAll([[]], [2,1], [2, 4, 4, 6])
+    = concatAll([[]], [1], [2, 2, 4, 4, 6])
+    = concatAll([[]], [], [1, 2, 2, 4, 4, 6])
+    = [1, 2, 2, 4, 4, 6]
+
+    Complexity: O(N + Z)
+     */
+    @tailrec
+    def betterFlatMap(remaining: RList[T], acc: RList[RList[S]]): RList[S] = {
+      if(remaining.isEmpty) concatAll(acc, RNil, RNil)
+      else betterFlatMap(remaining.tail, f(remaining.head).reverse :: acc)
+    }
+
+    /*
+    Complexity: O(N)
+     */
+    @tailrec
+    def concatAll(elements: RList[RList[S]], currList: RList[S], acc: RList[S]): RList[S] = {
+      if(elements.isEmpty && currList.isEmpty) acc
+      else if(currList.isEmpty) concatAll(elements.tail, elements.head, acc)
+      else concatAll(elements, currList.tail, currList.head :: acc)
+    }
+
+//    flatMapTailRec(this, RNil)
+    betterFlatMap(this, RNil)
   }
 
   // Complexity: O(N)
@@ -276,6 +321,45 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
     }
     duplicateTailRec(this, RNil)
   }
+
+  /*
+  [1,2,3].rotate(3) = [1,2,3]
+  [1,2,3].rotate(6) = [1,2,3]
+  [1,2,3].rotate(4) = [1,2,3].rotate(1)
+
+  Complexity = O(max(K, Size of List))
+   */
+  override def rotate(k: Int): RList[T] = {
+    def rotateTailRec(remaining: RList[T], rotationLeft: Int, buffer: RList[T]): RList[T] = {
+      if(remaining.isEmpty && rotationLeft == 0) this
+      else if(remaining.isEmpty && rotationLeft > 0) rotateTailRec(this, rotationLeft, RNil)
+      else if(rotationLeft == 0) remaining ++ buffer.reverse
+      else rotateTailRec(remaining.tail, rotationLeft - 1, remaining.head :: buffer)
+    }
+    rotateTailRec(this, k, RNil)
+  }
+
+  /*
+  Complexity O(N * k)
+   */
+  override def samples(k: Int): RList[T] = {
+    if(k <= 0) RNil
+    val random = new Random(System.currentTimeMillis())
+    val maxInd = this.length
+
+    def samplesTailRec(leftElement: Int, acc: RList[T]): RList[T] = {
+      if(leftElement == 0) acc
+      else {
+        val randomNum = random.nextInt(maxInd)
+        samplesTailRec(leftElement - 1, this(randomNum) :: acc)
+      }
+    }
+    def elegantSolution: RList[T] =
+      RList.from((1 to k).map(_ => random.nextInt(maxInd)).map(index => this(index)))
+
+//    samplesTailRec(k, RNil)
+    elegantSolution
+  }
 }
 
 // Creating companion object, to create RList
@@ -320,9 +404,13 @@ object ListProblems extends App {
   println(RList.from(1 to 5).map(x => x + 1))
 
   println("# FlatMap Function")
+  val largeList = RList.from(1 to 10000)
   val startAt = System.currentTimeMillis()
-  println(RList.from(1 to 10000).flatMap(x => x :: (x + 1) :: RNil))
+  println(largeList.flatMap(x => x :: (x + 1) :: RNil))
   println(s"Time Spent: ${System.currentTimeMillis() - startAt}")
+
+  println("# Flat Map Better Performance")
+  println((1 :: 2 :: 4 :: RNil).flatMap(x => x :: (x * 2) :: RNil))
 
   println("# filter Function")
   println(RList.from(1 to 5).filter(x => x % 2 == 0))
@@ -333,4 +421,12 @@ object ListProblems extends App {
 
   println("# Duplicate Each Element N Times")
   println((1 :: 2 :: 3 :: RNil).duplicateEach(3))
+
+  println("# Rotate List by index")
+  for {
+    i <- 1 to 10
+  } println(RList.from(1 to 5).rotate(i))
+
+  println("# Find Random samples")
+  println(RList.from(1 to 5).samples(3))
 }
