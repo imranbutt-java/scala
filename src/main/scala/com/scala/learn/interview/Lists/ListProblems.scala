@@ -50,6 +50,14 @@ sealed abstract class RList[+T] {
   def rotate(k: Int): RList[T]
   // Random samples
   def samples(k: Int): RList[T]
+
+  /**
+   * Hard Problems
+   */
+  // sorting using insertion sort
+  // sorting the list in the order defined by the Ordering Object
+  def insertionSort[S >: T](ordering: Ordering[S]): RList[S]
+  def mergeSort[S >: T](ordering: Ordering[S]): RList[S]
 }
 
 case object RNil extends RList[Nothing] {
@@ -88,6 +96,13 @@ case object RNil extends RList[Nothing] {
   override def rotate(k: Int): RList[Nothing] = RNil
 
   override def samples(k: Int): RList[Nothing] = RNil
+
+  /**
+   * Hard Problems
+   */
+  override def insertionSort[S >: Nothing](ordering: Ordering[S]): RList[S] = RNil
+
+  override def mergeSort[S >: Nothing](ordering: Ordering[S]): RList[S] = RNil
 }
 
 // Cons renamed to :: as acceptable name class in scala
@@ -360,6 +375,92 @@ case class ::[+T](override val head: T, override val tail: RList[T]) extends RLi
 //    samplesTailRec(k, RNil)
     elegantSolution
   }
+
+  /**
+   * Hard Problems
+   */
+  /*
+  [2,1,3].sorted = insertSortTailrec([2,1,3], [])
+  = insertSortTailrec([1,3], [2])
+  = insertSortTailrec([3], [1,2])
+  = insertSortTailrec([], [1,2,3])
+  = [1,2,3]
+  Complexity: O(N^2)
+   */
+  override def insertionSort[S >: T](ordering: Ordering[S]): RList[S] = {
+    // Complexity: O(N^2)
+    def insertSortTailrec(remaining: RList[T], acc: RList[S]): RList[S] = {
+      if(remaining.isEmpty) acc
+      else insertSortTailrec(remaining.tail, insertSort(remaining.head, RNil, acc))
+    }
+    /*
+    Means where that element should reside and before and after List are separated
+    List(3,1,2,4).insertSort = insertSort(3, [], [1,2,4])
+    = insertSort(3, [1], [2,4])
+    = insertSort(3, [2, 1], [4])
+    = [2,1].reverse + (3 :: [4])
+    = [1,2] + [3,4]
+    = [1,2,3,4]
+    Complexity: O(N)
+     */
+    def insertSort(elem: T, before: RList[S], after: RList[S]): RList[S] = {
+      if(after.isEmpty || ordering.lteq(elem, after.head)) before.reverse ++ (elem :: after)
+      else insertSort(elem, after.head :: before, after.tail)
+    }
+
+    insertSortTailrec(this, RNil)
+  }
+
+  override def mergeSort[S >: T](ordering: Ordering[S]): RList[S] = {
+    /*
+     merge([1, 3], [2, 4, 5], [])
+     = merge([3], [2, 4, 5], [1])
+     = merge([3], [4, 5], [2, 1])
+     = merge([], [4, 5], [3, 2, 1])
+     = [3, 2, 1].reverse ++ [4, 5]
+     = [1, 2, 3, 4, 5]
+     */
+    @tailrec
+    def merge(listA: RList[S], listB: RList[S], acc: RList[S]): RList[S] = {
+      if(listA.isEmpty) acc.reverse ++ listB
+      else if(listB.isEmpty) acc.reverse ++ listA
+      else if(ordering.lteq(listA.head, listB.head)) merge(listA.tail, listB, listA.head :: acc)
+      else merge(listA, listB.tail, listB.head :: acc)
+    }
+
+    /*
+    [3,1,2,5,4] => [[3], [1], [2], [5], [4]]
+
+    = mst([[3], [1], [2], [5], [4]], [])  // Make smallList and keep bigList RList
+    = mst([[2], [5], [4]], [[1, 3]])      // Applied merge on [[3], [1]]
+    = mst([[4]], [[2, 5], [1, 3]])
+    = mst([], [[4], [2, 5], [1, 3]])
+    = mst([[4], [2, 5], [1, 3]], [])      // Swap bigList with smallList when smallList is empty
+    = mst([[1, 3]], [[2, 4, 5]])          // Now again send first 2 elements and apply merge on them
+    = mst([], [[1, 3], [2, 4, 5]])
+    = mst([[1, 3], [2, 4, 5]], [])
+    = mst([], [[1, 2, 3, 4, 5]]
+    = [1, 2, 3, 4, 5]
+     */
+    @tailrec
+    def mergeSortTailrec(smallList: RList[RList[S]], bigList: RList[RList[S]]): RList[S] = {
+      if(smallList.isEmpty) {
+        if(bigList.isEmpty) RNil
+        else if(bigList.tail.isEmpty) bigList.head
+        else mergeSortTailrec(bigList, RNil)
+      } else if(smallList.tail.isEmpty) {
+        if(bigList.isEmpty) smallList.head
+        else mergeSortTailrec(smallList.head :: bigList, RNil)
+      } else {
+        val first = smallList.head
+        val second = smallList.tail.head
+        val merged = merge(first, second, RNil)
+        mergeSortTailrec(smallList.tail.tail, merged :: bigList)
+      }
+    }
+
+    mergeSortTailrec(this.map(x => x :: RNil), RNil)
+  }
 }
 
 // Creating companion object, to create RList
@@ -429,4 +530,12 @@ object ListProblems extends App {
 
   println("# Find Random samples")
   println(RList.from(1 to 5).samples(3))
+
+  println("###### Hard Problems ########")
+  println("# Inserting Sort")
+  println((3 :: 4 :: 2 :: 1 :: RNil).insertionSort(Ordering.fromLessThan[Int](_ < _)))
+
+  println("# Merge Sort")
+  println((3 :: RNil).mergeSort(Ordering.fromLessThan[Int](_ < _)))
+  println((3 :: 4 :: 2 :: 1 :: RNil).mergeSort(Ordering.fromLessThan[Int](_ < _)))
 }
