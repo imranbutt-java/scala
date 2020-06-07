@@ -54,5 +54,5 @@ object PrimeNumber extends App {
   println(isPrime(0))
 
   println("# Decompose")
-  println(findPrimeDivisor(14))
+  println(findPrimeDivisor(0))
 }
