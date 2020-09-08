@@ -16,14 +16,16 @@ object DijikstraNetworkNode extends App {
         (v,w) <- arr
         if dist(u) + w < dist(v)
       } {
-        dist(v) = dist(u) + w;
+        dist(v) = dist(u) + w
         pred(v) = u
-        Q += (v -> dist(v));
+        Q += (v -> dist(v))
       }
     }
     val ans = dist.tail.max //element 0 is just placeholder to alight indexes with input
-    println(pred)
+    pred.foreach(x => print(s"$x,"))
     if (ans == Int.MaxValue) -1 else ans;
   }
-  println( networkDelayTime(Array(Array(2,1,1), Array(2,3,1), Array(3,4,1)), 4, 2) )
+  println( networkDelayTime(Array(Array(2,1,1),
+                                  Array(2,3,1),
+                                  Array(3,4,1)), 4, 2) )
 }
