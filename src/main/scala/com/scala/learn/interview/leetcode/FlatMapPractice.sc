@@ -1,3 +1,4 @@
+import scala.collection.mutable
 //case class Book(title: String, authors: List[String])
 //case class Movie(title: String)
 //
@@ -48,5 +49,9 @@
 val segmentLength = 2
 val hardDiskSpace = List(2,3,1,6,5,4)
 val g = hardDiskSpace.grouped(segmentLength).map(x => x.min).toList.max
+
+val l = List(2,3,5,5).groupBy(identity).map{case(x, y) => x -> y.size}
+val linkedMap = mutable.LinkedHashMap[Int, Int]().withDefaultValue(0)
+val b = linkedMap.find(x => x._2 == 1).getOrElse((-1, -1))._1
 
 

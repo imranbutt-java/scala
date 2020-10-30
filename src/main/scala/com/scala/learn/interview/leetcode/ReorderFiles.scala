@@ -7,6 +7,6 @@ object ReorderFiles extends App {
     let.sortBy(_.span(_ != ' ').swap) ++ dig
   }
 
-  val a = reorderLogFiles(Array("1 n u", "r 527", "j 893", "6 14", "6 82"))
+  val a = reorderLogFiles(Array("2 n u", "1 abc", "j 893", "6 14", "6 82"))
   a.foreach(println)
 }

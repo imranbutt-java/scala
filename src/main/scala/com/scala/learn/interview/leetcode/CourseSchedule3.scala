@@ -21,4 +21,5 @@ object CourseSchedule3 extends App {
   }
 
   println(scheduleCourse(Array( Array(2, 5), Array(2, 19), Array(1, 8), Array(1, 3) )))
+//  println(scheduleCourse(Array( Array(100, 200), Array(200, 1300), Array(1000, 1250), Array(2000, 3200) )))
 }
