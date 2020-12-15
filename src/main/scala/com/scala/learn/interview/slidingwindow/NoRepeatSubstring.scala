@@ -21,7 +21,7 @@ object NoRepeatSubstring extends App {
 
       if(chars(chInd) != -1)
         left = Math.max(left, chars(chInd) + 1)
-        
+
       chars(chInd) = right
       maxStr = Math.max(maxStr, right - left + 1)
     }
