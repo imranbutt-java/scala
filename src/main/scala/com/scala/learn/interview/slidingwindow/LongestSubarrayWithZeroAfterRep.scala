@@ -16,7 +16,6 @@ object LongestSubarrayWithZeroAfterRep extends App {
     var left = 0
     var maxCount = 0
     var windowOneCount = 0
-    val count = Array.fill(2)(0)
 
     for((num, right) <- nums.zipWithIndex) {
       if(num == 1)
