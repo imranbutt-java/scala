@@ -17,17 +17,26 @@ import scala.collection.mutable
  */
 object SubarrayProductLessThanTarget extends App {
   def productLessThan(nums: Array[Int], target: Int): Array[Array[Int]] = {
+    if(target == 0) return Array.empty
+
     var left = 0
     var product = 1
+    var lastZero = -1
     val ans = mutable.ListBuffer[Array[Int]]()
     for((num, right) <- nums.zipWithIndex) {
       product *= num
-      while(product >= target && left < nums.length) {
-        product /= nums(left)
-        left += 1
+      if(num == 0) {
+        lastZero = 0
+        product = 1
+        left = right + 1
+      } else {
+        while (product >= target && left <= right) {
+          product /= nums(left)
+          left += 1
+        }
       }
       val tmp = mutable.ListBuffer[Int]()
-      for(i <- right to left by -1) {
+      for (i <- right to left by -1) {
         tmp.addOne(nums(i))
         ans.addOne(tmp.toArray)
       }

@@ -3,18 +3,27 @@ package com.scala.learn.interview.intervals
 import scala.collection.mutable
 
 /* imransarwar created on 12/12/2020*/
+/**
+ * Given an array of meeting time intervals consisting of start and end times [[s1,e1],[s2,e2],...] (si < ei),
+ * find the minimum number of conference rooms required.
+ *
+ * Example 1:
+ *
+ * Input: [[0, 30],[5, 10],[15, 20]]
+ * Output: 2
+ */
 object MeetingRoom2 extends App {
   def minMeetingRooms(intervals: Array[Array[Int]]): Int = {
     if(intervals == null || intervals.length == 0) return 0
-    val pq = mutable.PriorityQueue[Option[Int]](Some(0))(Ordering[Option[Int]].reverse)
-
+    val minHeap = mutable.PriorityQueue[Option[Int]](Some(0))(Ordering.by(identity)).reverse
+    val sortedByStart = intervals.sortBy(_.head)
     for {
-      lastMeeting <- pq.dequeue
-      booking <- intervals.sortBy(_(0))
+      currentMeeting <- sortedByStart
+      lastMeeting <- minHeap.head
     } {
-      if(lastMeeting < booking(1)) pq.enqueue(Some(lastMeeting))
-      pq.enqueue(Some(booking(1)))
+      if (currentMeeting.head > lastMeeting) minHeap.dequeue
+      minHeap.enqueue(Some(currentMeeting.last))
     }
-    pq.size
+    minHeap.size
   }
 }
