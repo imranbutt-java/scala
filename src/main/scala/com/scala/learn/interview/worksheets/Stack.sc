@@ -3,6 +3,7 @@ import scala.collection.mutable._
 val stack = Stack[Int]()
 val list = ListBuffer[Int]()
 
+
 val n = 352
 val nums = n.toString.toArray
 nums.splitAt(2)._2.toString.reverse
@@ -58,3 +59,8 @@ arr3.indices.foldLeft("")((initial, preRes) =>  {
   println(preRes)
   preRes +""+ initial
 })
+
+'a' > 'c'
+'c' > 'a'
+
+

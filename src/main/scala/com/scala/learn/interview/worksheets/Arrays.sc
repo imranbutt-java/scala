@@ -10,3 +10,15 @@ interval.foldLeft(List[Array[Int]]()) {
   case (tail, y) =>
     y :: tail
 }.toArray
+
+val matrix = Array[Array[Int]]()
+val res = matrix
+  .map(arr => arr(0))
+  .sortWith(_ < _)
+  .foldLeft((0, Option[Int](0))) {(tup, value) =>
+    (Math.max(tup._1, tup._2.map(x => value - x).get), Option(value))
+  }._1
+
+('a' to 'z').toArray
+
+5 % 5
